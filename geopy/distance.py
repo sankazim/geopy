@@ -112,6 +112,8 @@ class Distance(object):
 
         kilometers += units.kilometers(**kwargs)
         self.__kilometers = kilometers
+	self.startbearingdeg = None
+	self.endbearingdeg = None
 
     def __add__(self, other):
         if isinstance(other, Distance):
@@ -416,6 +418,21 @@ class vincenty(Distance):
                 )
             )
         )
+
+	#Compute the Bearing
+	#http://en.wikipedia.org/wiki/Vincenty%27s_formulae
+	#U1 = reduced_lat1
+	#U2 = reduced_lat2
+	cl = cos_lambda_lng	
+	sl = sin_lambda_lng
+	c1 = cos_reduced1
+	c2 = cos_reduced2
+	s1 = sin_reduced1
+	s2 = sin_reduced2
+	a1 = atan2(c2* sl, c1*s2 - s1*c2*cl)
+	a2 = atan2(c1* sl, -s1*c2 + c1*s2*cl)
+	self.startbearingdeg = units.degrees(radians=a1)
+	self.endbearingdeg = units.degrees(radians=a2)
 
         s = minor * A * (sigma - delta_sigma)
         return s
